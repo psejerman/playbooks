@@ -1,0 +1,64 @@
+- name: Install git package
+  apt:
+    pkg:
+      - git
+    state: latest
+    update_cache: true
+  become: yes
+
+- name: Set global username for git
+  community.general.git_config:
+    name: user.name
+    scope: global
+    value: "{{git_user_name}}"
+
+- name: Set global email for git
+  community.general.git_config:
+    name: user.email
+    scope: global
+    value: "{{git_user_email}}"
+
+- name: Generate SSH-Keys for git repository
+  community.crypto.openssh_keypair:
+    path: "~/.ssh/{{project_name}}-key"
+  register: generator_return
+
+- name: Add a ssh config for repository operations on github.com
+  community.general.ssh_config:
+    host: github.com
+    hostname: github.com
+    ssh_config_file: ~/.ssh/config
+    identity_file: "~/.ssh/{{project_name}}-key"
+    state: present
+
+#- name: output
+#  debug:
+#    msg:
+#      "Add this public key to your git repository ({{project_name}}) --> {{ generator_return.public_key }}"
+
+#- name: break
+#  pause:
+#    prompt: Press ENTER to proceed.
+
+#- name: Create project folder
+#  file:
+#    path: "/opt/{{project_name}}"
+#    state: directory
+#    mode: '0750'
+#    owner: user
+#    group: user
+#  become: yes
+
+#- name: Clone repository to host
+#  git:
+#    repo: "{{git_repo}}"
+#    version: "{{git_branch}}"
+#    dest: "/opt/{{project_name}}"
+#    key_file: "~/.ssh/{{project_name}}-key"
+#    accept_hostkey: yes
+#  become: no
+
+#- name: Set permissions on subfolders
+#  command: find {{project_folder_root}}{{project_name}} -type d -exec chmod 0750 {} \;
+#- name: Set permissions on subfiles
+#  command: find "{{project_folder_root}}{{project_name}}" -type f -exec chmod 0640 {} \;

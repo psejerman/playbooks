@@ -1,0 +1,21 @@
+---
+- hosts: all
+  vars:
+    # iptables variables
+    ssh_port: 22
+    # Git variables
+    git_repo: git@github.com:psejerman/node-cicd-docker.git
+    git_branch: main
+    project_name: node-cicd-docker
+    project_folder_root: /opt/
+    git_user_name: "Peter Sejerman"
+    git_user_email: p.sejerman@gmail.com
+
+  tasks:
+  - name: Import tasks from other files
+    block:
+      - include_tasks: install_requisites.yml
+      - include_tasks: install_docker.yml
+      - include_tasks: setup_git.yml
+      - include_tasks: configure_iptables.yml
+      #- include_tasks: configure_fail2ban.yml

@@ -1,0 +1,18 @@
+- name: Install fail2ban
+  apt:
+    pkg:
+      - fail2ban
+    state: latest
+    update_cache: true
+  become: yes
+
+- name: Configure fail2ban
+  roles:
+    - oefenweb.fail2ban
+    vars:
+      fail2ban_services:
+        # In older versions of Fail2Ban this is called ssh
+        - name: sshd
+          port: "{{ssh_port}}"
+          maxretry: 5
+          bantime: 10

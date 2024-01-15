@@ -1,0 +1,145 @@
+- name: Allow loopback traffic
+  ansible.builtin.iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+  become: yes
+
+- name: Allow related and established connections
+  ansible.builtin.iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+  become: yes
+
+- name: Block SYN-FIN attack
+  ansible.builtin.iptables:
+    chain: PREROUTING
+    table: raw
+    protocol: tcp
+    tcp_flags:
+      flags: ["FIN","SYN"]
+      flags_set: ["FIN","SYN"]
+    jump: DROP
+  become: yes
+
+- name: Block SYN-RST attack
+  ansible.builtin.iptables:
+    chain: PREROUTING
+    table: raw
+    protocol: tcp
+    tcp_flags:
+      flags: ["SYN","RST"]
+      flags_set: ["SYN","RST"]
+    jump: DROP
+  become: yes
+
+- name: Block X-Mas attack
+  ansible.builtin.iptables:
+    chain: PREROUTING
+    table: raw
+    protocol: tcp
+    tcp_flags:
+      flags: ["FIN","SYN","RST","PSH","ACK","URG"]
+      flags_set: ["FIN","PSH","URG"]
+    jump: DROP
+  become: yes
+
+- name: Block nmap FIN scan
+  ansible.builtin.iptables:
+    chain: PREROUTING
+    table: raw
+    protocol: tcp
+    tcp_flags:
+      flags: ["FIN","SYN","RST","PSH","ACK","URG"]
+      flags_set: ["FIN"]
+    jump: DROP
+  become: yes
+
+- name: Block NULLflags attack
+  ansible.builtin.iptables:
+    chain: PREROUTING
+    table: raw
+    protocol: tcp
+    tcp_flags:
+      flags: ["FIN","SYN","RST","PSH","ACK","URG"]
+      flags_set: ["NONE"]
+    jump: DROP
+  become: yes
+
+- name: Block ALLflags attack attack
+  ansible.builtin.iptables:
+    chain: PREROUTING
+    table: raw
+    protocol: tcp
+    tcp_flags:
+      flags: ["FIN","SYN","RST","PSH","ACK","URG"]
+      flags_set: ["FIN","SYN","RST","PSH","ACK","URG"]
+    jump: DROP
+  become: yes
+
+
+- name: Allow new incoming connection for SSH
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "{{ssh_port}}"
+    ctstate: NEW
+    jump: ACCEPT
+  become: yes
+
+- name: Allow connections for HTTP
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    ctstate: NEW
+    destination_port: 80
+    jump: ACCEPT
+  become: yes
+
+- name: Allow connections for HTTPS
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    ctstate: NEW
+    destination_port: 443
+    jump: ACCEPT
+  become: yes
+
+- name: Drop INVALID packets on INPUT
+  ansible.builtin.iptables:
+    chain: "{{ item }}"
+    ctstate: INVALID
+    jump: DROP
+  with_items: ["INPUT", "FORWARD", "OUTPUT"]
+  become: yes
+
+- name: Set the policy for the INPUT chain to DROP
+  ansible.builtin.iptables:
+    chain: INPUT
+    policy: DROP
+  become: yes
+
+- name: Set the policy for the FORWARD chain to DROP
+  ansible.builtin.iptables:
+    chain: FORWARD
+    policy: DROP
+  become: yes
+
+- name: Set the policy for the OUTPUT chain to ACCEPT
+  ansible.builtin.iptables:
+    chain: OUTPUT
+    policy: ACCEPT
+  become: yes
+
+
+# This will apply only to IPv6 filter table.
+- name: save current state of the firewall in system file
+  community.general.iptables_state:
+    ip_version: ipv4
+    table: filter
+    state: saved
+    path: /etc/iptables/rules.v4
+  become: yes
+
+

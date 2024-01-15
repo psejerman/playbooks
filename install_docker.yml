@@ -1,0 +1,43 @@
+- name: Get DEB architecture
+  shell: dpkg --print-architecture
+  register: deb_architecture
+
+- name: Uninstall all conflicting packages
+  apt:
+    pkg:
+      - docker.io
+      - docker-doc
+      - docker-compose
+      - podman-docker
+      - containerd
+      - runc
+    state: absent
+    update_cache: true
+  become: yes
+
+- name: Add Docker GPG apt Key
+  apt_key:
+    url: https://download.docker.com/linux/{{ansible_distribution | lower}}/gpg
+    keyring: /etc/apt/keyrings/docker.gpg
+    state: present
+  become: yes
+
+- name: Add docker source to apt
+  apt_repository:
+    repo: "deb [arch={{deb_architecture.stdout}} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/{{ansible_distribution | lower}} {{ ansible_distribution_release | lower}} stable"
+    filename: docker
+    state: present
+  become: yes
+
+- name: Update apt and install docker binaries
+  apt:
+    pkg:
+      - docker-ce
+      - docker-compose
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: latest
+    update_cache: true
+  become: yes
