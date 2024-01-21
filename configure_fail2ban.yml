@@ -6,13 +6,36 @@
     update_cache: true
   become: yes
 
-- name: Configure fail2ban
-  roles:
-    - oefenweb.fail2ban
-    vars:
-      fail2ban_services:
-        # In older versions of Fail2Ban this is called ssh
-        - name: sshd
-          port: "{{ssh_port}}"
-          maxretry: 5
-          bantime: 10
+- name: Stop service fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: stopped
+  become: yes
+
+- name: Copy fsshd jail
+  copy:
+    src: fail2ban/jails/sshd.conf
+    dest: /etc/fail2ban/jail.d/sshd.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+
+- name: Remove defaults-debian.conf file
+  file:
+    path: /etc/fail2ban/jail.d/defaults-debian.conf
+    state: absent
+
+- name: Set ssh portnumber in jail config
+  replace:
+    path: /etc/fail2ban/jail.d/sshd.conf
+    regexp: port_number
+    replace: "{{  ssh_port  }}"
+  become: yes
+
+
+- name: Start service fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+  become: yes
