@@ -25,6 +25,7 @@
   file:
     path: /etc/fail2ban/jail.d/defaults-debian.conf
     state: absent
+  become: yes
 
 - name: Set ssh portnumber in jail config
   replace:
