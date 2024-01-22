@@ -1,6 +1,8 @@
 ---
 - hosts: all
   vars:
+    # Fail2ban config vars
+    fail2ban_mail_dest: "root@localhost"
     # iptables variables
     ssh_port: 22
     # Git variables

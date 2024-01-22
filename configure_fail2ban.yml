@@ -1,6 +1,7 @@
 - name: Install fail2ban
   apt:
     pkg:
+      - iptables
       - fail2ban
     state: latest
     update_cache: true
@@ -12,10 +13,10 @@
     state: stopped
   become: yes
 
-- name: Copy fsshd jail
+- name: Copy sshd jail
   copy:
-    src: fail2ban/jails/sshd.conf
-    dest: /etc/fail2ban/jail.d/sshd.conf
+    src: fail2ban/jails/sshd.local
+    dest: /etc/fail2ban/jail.d/sshd.local
     owner: root
     group: root
     mode: 0644
@@ -27,13 +28,28 @@
     state: absent
   become: yes
 
-- name: Set ssh portnumber in jail config
+- name: Set ssh portnumber in sshd jail config
   replace:
-    path: /etc/fail2ban/jail.d/sshd.conf
+    path: /etc/fail2ban/jail.d/sshd.local
     regexp: port_number
     replace: "{{  ssh_port  }}"
   become: yes
 
+- name: Copy jail.local file
+  copy:
+    src: fail2ban/jail.local
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: 0644
+  become: yes
+
+- name: Set destemail in jail.local
+  replace:
+    path: /etc/fail2ban/jail.local
+    regexp: fail2ban_mail_dest
+    replace: "{{  fail2ban_mail_dest  }}"
+  become: yes
 
 - name: Start service fail2ban
   ansible.builtin.service:

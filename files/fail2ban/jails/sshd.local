@@ -1,6 +1,6 @@
 [sshd]
-backend = systemd
 enabled = true
+mode = aggressive
 port = port_number
 filter = sshd
 logpath = /var/log/auth.log

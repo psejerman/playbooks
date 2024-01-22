@@ -1,3 +1,11 @@
+- name: Install iptables
+  apt:
+    pkg:
+      - iptables
+    state: latest
+    update_cache: true
+  become: yes
+
 - name: Allow loopback traffic
   ansible.builtin.iptables:
     chain: INPUT
