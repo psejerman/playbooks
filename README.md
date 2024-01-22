@@ -1,6 +1,6 @@
 # Playbooks for basic server configuration
 
-##Supported distributions:
+## Supported distributions:
 - Debian 12 (Bookworm)
 
 ## Prerequisites
