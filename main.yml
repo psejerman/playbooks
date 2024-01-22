@@ -12,6 +12,7 @@
     project_dir: "/opt/projects/"
     git_repo: "Some HTTP Repo"
     git_branch: "main"
+    git_repo_url: "https://github.com/psejerman/node-cicd-docker"
     project_name: "node-cicd-docker"
     project_folder_root: "/some/path/"
     git_user_name: "Peter Sejerman"

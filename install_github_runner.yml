@@ -1,4 +1,4 @@
-- name: Create actions-runner directory
+- name: Creating actions-runner directory
   file:
     path: "{{ git_runner_dir }}"
     owner: "{{ user_name }}"
@@ -8,52 +8,51 @@
     recurse: yes
   become: yes
 
-- name: Process github actions-runner instructions
+- name: Processing github actions-runner instructions
   block:
     - name: Read the download link from CLI
       pause:
         prompt: "Create a self-hosted runner in your github account and enter the provided download link"
       register: runner_download_url
 
-    - name: Read the token from CLI
+    - name: Reading the token from CLI
       pause:
         prompt: "Enter the provided token"
       register: runner_token
 
-    - name: Read the download checksum from CLI
+    - name: Reading the download checksum from CLI
       pause:
         prompt: "Enter the provided checksum"
       register: runner_checksum
 
-    #- name: Download runner
-    #  get_url:
-    #    url: "{{ runner_download_url.user_input }}"
-    #    dest: "{{ git_runner_dir }}"
-    #    mode: "0440"
-    #    checksum: "sha256:{{ runner_checksum.user_input }}"
+    - name: Downloading actions-runner
+      get_url:
+        url: "{{ runner_download_url.user_input }}"
+        dest: "{{ git_runner_dir }}"
+        mode: "0440"
+        checksum: "sha256:{{ runner_checksum.user_input }}"
 
-    - name: Get archive filename
+    - name: Resolving archive filename
       shell:
         cmd: 'ls {{ git_runner_dir }} | grep "tar.gz"'
       register: archive_file_name
 
-    - name: Extract actions-runner from archive
+    - name: Extracting actions-runner from archive
       unarchive:
         src: "{{ git_runner_dir }}{{ archive_file_name.stdout }}"
         dest: "{{ git_runner_dir }}"
         remote_src: yes
 
+    - name: Configuring actions-runner
+      shell:
+        chdir: "{{ git_runner_dir }}"
+        cmd: "./config.sh --url {{ git_repo_url }} --token {{ runner_token.user_input }} --work ../ --name {{ ansible_hostname }} --unattended"
 
-    - name: output url
-      debug:
-        msg: "URL: {{runner_download_url.user_input}}"
-    - name: output cs
-      debug:
-        msg: "CS: {{runner_checksum.user_input}}"
-
-    - name: output fn
-      debug:
-        msg: "FN: {{archive_file_name.stdout}}"
+    - name: Installing and running actions-runner in daemon mode
+      shell:
+        chdir: "{{ git_runner_dir }}"
+        cmd: "./svc.sh install && ./svc.sh start"
+      become: yes
 
 
 
