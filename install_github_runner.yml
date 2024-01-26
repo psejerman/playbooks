@@ -8,6 +8,9 @@
     recurse: yes
   become: yes
 
+- name: Populate service facts
+  service_facts:
+
 - name: Processing github actions-runner instructions
   block:
     - name: Read the download link from CLI
@@ -19,7 +22,7 @@
       pause:
         prompt: "Enter the provided token"
       register: runner_token
-
+    
     - name: Reading the download checksum from CLI
       pause:
         prompt: "Enter the provided checksum"
@@ -53,6 +56,8 @@
         chdir: "{{ git_runner_dir }}"
         cmd: "./svc.sh install && ./svc.sh start"
       become: yes
+
+  when: ansible_facts.services["actions.runner.psejerman-node-cicd-docker.ansible.service"].state != "running"
 
 
 
