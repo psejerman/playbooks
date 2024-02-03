@@ -1,4 +1,4 @@
-- name: Install iptables
+- name: Installing iptables
   apt:
     pkg:
       - iptables
@@ -6,21 +6,21 @@
     update_cache: true
   become: yes
 
-- name: Allow loopback traffic
+- name: Allowing loopback traffic
   ansible.builtin.iptables:
     chain: INPUT
     in_interface: lo
     jump: ACCEPT
   become: yes
 
-- name: Allow related and established connections
+- name: Allowing related and established connections
   ansible.builtin.iptables:
     chain: INPUT
     ctstate: ESTABLISHED,RELATED
     jump: ACCEPT
   become: yes
 
-- name: Block SYN-FIN attack
+- name: Blocking SYN-FIN attack
   ansible.builtin.iptables:
     chain: PREROUTING
     table: raw
@@ -31,7 +31,7 @@
     jump: DROP
   become: yes
 
-- name: Block SYN-RST attack
+- name: Blocking SYN-RST attack
   ansible.builtin.iptables:
     chain: PREROUTING
     table: raw
@@ -42,7 +42,7 @@
     jump: DROP
   become: yes
 
-- name: Block X-Mas attack
+- name: Blocking X-Mas attack
   ansible.builtin.iptables:
     chain: PREROUTING
     table: raw
@@ -53,7 +53,7 @@
     jump: DROP
   become: yes
 
-- name: Block nmap FIN scan
+- name: Blocking nmap FIN scan
   ansible.builtin.iptables:
     chain: PREROUTING
     table: raw
@@ -64,7 +64,7 @@
     jump: DROP
   become: yes
 
-- name: Block NULLflags attack
+- name: Blocking NULLflags attack
   ansible.builtin.iptables:
     chain: PREROUTING
     table: raw
@@ -75,7 +75,7 @@
     jump: DROP
   become: yes
 
-- name: Block ALLflags attack attack
+- name: Blocking ALLflags attack attack
   ansible.builtin.iptables:
     chain: PREROUTING
     table: raw
@@ -87,7 +87,7 @@
   become: yes
 
 
-- name: Allow new incoming connection for SSH
+- name: Allowing new incoming connection for SSH
   ansible.builtin.iptables:
     chain: INPUT
     protocol: tcp
@@ -96,7 +96,7 @@
     jump: ACCEPT
   become: yes
 
-- name: Allow connections for HTTP
+- name: Allowing connections for HTTP
   ansible.builtin.iptables:
     chain: INPUT
     protocol: tcp
@@ -105,7 +105,7 @@
     jump: ACCEPT
   become: yes
 
-- name: Allow connections for HTTPS
+- name: Allowing connections for HTTPS
   ansible.builtin.iptables:
     chain: INPUT
     protocol: tcp
@@ -114,7 +114,7 @@
     jump: ACCEPT
   become: yes
 
-- name: Drop INVALID packets on INPUT
+- name: Dropping INVALID packets on INPUT
   ansible.builtin.iptables:
     chain: "{{ item }}"
     ctstate: INVALID
@@ -122,27 +122,25 @@
   with_items: ["INPUT", "FORWARD", "OUTPUT"]
   become: yes
 
-- name: Set the policy for the INPUT chain to DROP
+- name: Setting the policy for the INPUT chain to DROP
   ansible.builtin.iptables:
     chain: INPUT
     policy: DROP
   become: yes
 
-- name: Set the policy for the FORWARD chain to DROP
+- name: Setting the policy for the FORWARD chain to DROP
   ansible.builtin.iptables:
     chain: FORWARD
     policy: DROP
   become: yes
 
-- name: Set the policy for the OUTPUT chain to ACCEPT
+- name: Setting the policy for the OUTPUT chain to ACCEPT
   ansible.builtin.iptables:
     chain: OUTPUT
     policy: ACCEPT
   become: yes
 
-
-# This will apply only to IPv6 filter table.
-- name: save current state of the firewall in system file
+- name: Saving current state of the firewall in system file
   community.general.iptables_state:
     ip_version: ipv4
     table: filter

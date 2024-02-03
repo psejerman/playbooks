@@ -16,14 +16,18 @@
     project_name: "node-cicd-docker"
     project_folder_root: "/some/path/"
     git_user_name: "Peter Sejerman"
+    git_user_id: "psejerman"
     git_user_email: "p.sejerman@gmail.com"
+    git_runner_service_name: "actions.runner.{{ git_user_id }}-{{ project_name }}.{{ ansible_hostname }}"
 
   tasks:
   - name: Import tasks from other files
     block:
-      #- include_tasks: install_requisites.yml
-      #- include_tasks: install_docker.yml
-      #- include_tasks: setup_git.yml
-      #- include_tasks: configure_iptables.yml
-      #- include_tasks: configure_fail2ban.yml
+      - include_tasks: install_requisites.yml
+      - include_tasks: install_docker.yml
+      - include_tasks: configure_iptables.yml
+      - include_tasks: configure_fail2ban.yml
       - include_tasks: install_github_runner.yml
+      #- include_tasks: test.yml ## Playground for module tests
+      ## Setup repo for commits and pushes from target host (not needed for production)
+      #- include_tasks: setup_git.yml

@@ -13,7 +13,7 @@
 
 - name: Processing github actions-runner instructions
   block:
-    - name: Read the download link from CLI
+    - name: Reading the download link from CLI
       pause:
         prompt: "Create a self-hosted runner in your github account and enter the provided download link"
       register: runner_download_url
@@ -57,7 +57,11 @@
         cmd: "./svc.sh install && ./svc.sh start"
       become: yes
 
-  when: ansible_facts.services["actions.runner.psejerman-node-cicd-docker.ansible.service"].state != "running"
+  when: ansible_facts.services[git_runner_service_name ~ ".service"] is not defined
 
-
+- name: Starting service github runner service
+  ansible.builtin.service:
+    name: "{{ git_runner_service_name }}.service"
+    state: started
+  become: yes
 

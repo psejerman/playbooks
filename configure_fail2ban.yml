@@ -28,14 +28,14 @@
     state: absent
   become: yes
 
-- name: Set ssh portnumber in sshd jail config
+- name: Setting ssh port number in sshd jail config
   replace:
     path: /etc/fail2ban/jail.d/sshd.local
     regexp: port_number
     replace: "{{  ssh_port  }}"
   become: yes
 
-- name: Copy jail.local file
+- name: Copying jail.local file
   copy:
     src: fail2ban/jail.local
     dest: /etc/fail2ban/jail.local
@@ -44,14 +44,14 @@
     mode: 0644
   become: yes
 
-- name: Set destemail in jail.local
+- name: Setting destination mail in jail.local
   replace:
     path: /etc/fail2ban/jail.local
     regexp: fail2ban_mail_dest
     replace: "{{  fail2ban_mail_dest  }}"
   become: yes
 
-- name: Start service fail2ban
+- name: Starting service fail2ban
   ansible.builtin.service:
     name: fail2ban
     state: started

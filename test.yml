@@ -1,0 +1,14 @@
+- name: Populate service facts
+  service_facts:
+
+- name: Processing github actions-runner instructions
+
+
+  block:
+    - name: Test
+      debug:
+        msg: "test"
+  when: git_runner_service_name is not defined
+  #when: ansible_facts.services["actions.runner.{{ git_user_id }}-{{ project_name }}.{{ ansible_hostname }}.service"] is not defined
+  #ansible_facts.services["actions.runner.psejerman-node-cicd-docker.ansible.service"] is not defined
+
