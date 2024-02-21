@@ -23,7 +23,7 @@
   tasks:
   - name: Import tasks from other files
     block:
-      - include_tasks: install_requisites.yml
+      - include_tasks: install_prequisites.yml
       - include_tasks: install_docker.yml
       - include_tasks: configure_iptables.yml
       - include_tasks: configure_fail2ban.yml
